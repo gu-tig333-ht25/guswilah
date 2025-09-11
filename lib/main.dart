@@ -43,7 +43,7 @@ class TodoListPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("TIG333 TODO"),
-        backgroundColor: Colors.grey[300],
+        backgroundColor: const Color.fromARGB(255, 141, 86, 208),
         actions: [ //knappar
           IconButton( //tre prickar på sidan som meny popup
             icon: Icon(Icons.more_vert),
@@ -104,7 +104,7 @@ class AddTodoPage extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: Text("TIG333 TODO"),
-        backgroundColor: Colors.grey[300],
+        backgroundColor: const Color.fromARGB(255, 141, 86, 208),
         leading:IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
