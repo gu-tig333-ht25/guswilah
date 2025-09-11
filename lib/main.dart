@@ -41,7 +41,7 @@ class TodoListPage extends StatelessWidget {
     ];
 
     return Scaffold(
-      appBar: AppBar(
+      appBar: AppBar( //översta widgeten med titeln på
         title: Text("TIG333 TODO"),
         backgroundColor: const Color.fromARGB(255, 141, 86, 208),
         actions: [ //knappar
@@ -96,13 +96,13 @@ class TodoListPage extends StatelessWidget {
         }
       }
 
-class AddTodoPage extends StatelessWidget {
+class AddTodoPage extends StatelessWidget { //gör sida 2
   AddTodoPage({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
+      appBar: AppBar( //Översta widgeten med texten i, samma som som sida 1
         title: Text("TIG333 TODO"),
         backgroundColor: const Color.fromARGB(255, 141, 86, 208),
         leading:IconButton(
