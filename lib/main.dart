@@ -44,8 +44,8 @@ class TodoListPage extends StatelessWidget {
       appBar: Appbar(
         title: Text("TIG333 TODO"),
         backgroundColor: Colors.grey[300],
-        actions: [
-          IconButton(
+        actions: [ //knappar
+          IconButton( //tre prickar på sidan som meny popup
             icon: Icon(Icons.more_vert),
             onPressed: (){
               showDialog(
@@ -67,5 +67,34 @@ class TodoListPage extends StatelessWidget {
           ),
         ],
       ),
-  } //här är det helt klart nått knas
-  }
+  
+      body: ListView.builder( //lista baserat på hur många element som finns
+        itemCount:todos.length,
+        itemBuilder:(context, index) {
+          return ListTile(
+            leading: Checkbox(value: false, onChanged:(_) //checkbox till vänster
+            {}),
+            title:Text(
+              todos[index],
+              style:todos[index] == "Tidy room"? //nu hårdkodar jag här, ändra
+              TextStyle(
+                decoration: TextDecoration.lineThrough,
+                )
+                :null,
+                ),
+                trailing: Icon(Icons.close),
+                );
+              },
+            ),
+            floatingActionButton: FloatingActionButton( //plustecknet på sidan
+              onPressed:(){
+                Navigator.push(context,
+                MaterialPageRoute(builder:(context)=> const //öppna nästa sida
+                AddTodoPage()), //måste göra klassen
+                );
+              },
+              child: Icon(Icons.add),
+            ),
+          );
+        }
+      }
