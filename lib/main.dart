@@ -68,27 +68,24 @@ class TodoListPage extends StatelessWidget {
         ],
       ),
   
-      body: ListView.builder( //lista baserat på hur många element som finns
-        itemCount:todos.length,
-        itemBuilder:(context, index) {
-          return ListTile(
-            leading: Checkbox(value: false, onChanged:(_) //checkbox till vänster
-            {}),
-            title:Text(
-              todos[index],
-              style:todos[index] == "Tidy room"? //nu hårdkodar jag här, ändra
-              TextStyle(
-                decoration: TextDecoration.lineThrough,
-                )
-                :null,
-                ),
-                trailing: Icon(Icons.close),
-                );
-              },
-            ),
+      body: ListView.builder( // lista baserat på hur många element som finns
+  itemCount: todos.length,
+  itemBuilder: (context, index) {
+    return ListTile(
+      leading: Checkbox(
+        value: false,
+        onChanged: (_) {}, // checkbox till vänster
+      ),
+      title: Text(todos[index]),
+      trailing: Icon(Icons.close),
+    );
+  },
+),
+
             floatingActionButton: FloatingActionButton( //plustecknet på sidan
               onPressed:(){
-                Navigator.push(context,
+                Navigator.push(
+                  context,
                 MaterialPageRoute(builder:(context)=> //öppna nästa sida
                 AddTodoPage()), //måste göra klassen
                 );
