@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart'; //Hämtar designbibliotek
 
 main() { //startpunkt
-  runApp(MyApp()); //kör igång appen
+  runApp(MyApp()); //kör igång appen, börja med klassen MyApp
 }
 
-class MyApp extends StatelessWidget { //huvudwidget
+class MyApp extends StatelessWidget { //huvudwidget, har inget minne
   MyApp({super.key});
 
   final ThemeData myCustomTheme = ThemeData( //bestäm tema och färg
@@ -19,13 +19,13 @@ class MyApp extends StatelessWidget { //huvudwidget
     return MaterialApp(
       title: "TIG333 TODO",
       theme: myCustomTheme,
-      home: TodoListPage(),
+      home: TodoListPage(), //Visa TodoListPage sidan först
       );
   }
 }
 
 class TodoListPage extends StatelessWidget {
-  TodoListPage({super.key});
+  TodoListPage({super.key}); //sida nr.1
 
   @override
   Widget build(BuildContext context) {//gör listan
@@ -40,18 +40,18 @@ class TodoListPage extends StatelessWidget {
       "Meditate",
     ];
 
-    return Scaffold(
+    return Scaffold( //standardlayout för en sida
       appBar: AppBar( //översta widgeten med titeln på
         title: Text("TIG333 TODO"),
         backgroundColor: const Color.fromARGB(255, 141, 86, 208),
         actions: [ //knappar
-          IconButton( //tre prickar på sidan som meny popup
+          IconButton( //tre prickar på sidan som meny, jag ser den inte pga debuggrejen
             icon: Icon(Icons.more_vert),
             onPressed: (){
               showDialog(
                 context: context,
                 builder: (context){
-                  return AlertDialog(
+                  return AlertDialog( //popup
                     content: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
@@ -68,26 +68,26 @@ class TodoListPage extends StatelessWidget {
         ],
       ),
   
-      body: ListView.builder( // lista baserat på hur många element som finns
+      body: ListView.builder( // lista baserat på hur många saker i todos som finns
   itemCount: todos.length,
   itemBuilder: (context, index) {
-    return ListTile(
-      leading: Checkbox(
-        value: false,
-        onChanged: (_) {}, // checkbox till vänster
+    return ListTile( //varje rad i listan kommer ha
+      leading: Checkbox( //checkbox till vänster
+        value: false, //har inget värde än
+        onChanged: (_) {},
       ),
-      title: Text(todos[index]),
-      trailing: Icon(Icons.close),
+      title: Text(todos[index]), //uppgiften man ska göra (text)
+      trailing: Icon(Icons.close), //kryss till höger
     );
   },
 ),
 
             floatingActionButton: FloatingActionButton( //plustecknet på sidan
               onPressed:(){
-                Navigator.push(
+                Navigator.push( //gå framåt i historiken
                   context,
                 MaterialPageRoute(builder:(context)=> //öppna nästa sida
-                AddTodoPage()), //måste göra klassen
+                AddTodoPage()),
                 );
               },
               child: Icon(Icons.add),
@@ -105,9 +105,9 @@ class AddTodoPage extends StatelessWidget { //gör sida 2
       appBar: AppBar( //Översta widgeten med texten i, samma som som sida 1
         title: Text("TIG333 TODO"),
         backgroundColor: const Color.fromARGB(255, 141, 86, 208),
-        leading:IconButton(
+        leading:IconButton( //tillbaka pil
           icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
+          onPressed: () => Navigator.pop(context), //tillbaka till sida 1
           ),
         ),
 
@@ -116,7 +116,7 @@ class AddTodoPage extends StatelessWidget { //gör sida 2
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        TextField(
+        TextField( //ruta att skriva ny uppgift i
           decoration: InputDecoration(
             border: OutlineInputBorder(),
             hintText: "What are you going to do?",
@@ -124,7 +124,7 @@ class AddTodoPage extends StatelessWidget { //gör sida 2
         ),
         SizedBox(height:20),
         Center(
-          child: TextButton.icon(
+          child: TextButton.icon( //knapp för att lägga till i listan på sida 1
             onPressed: () {},
             icon: Icon(Icons.add),
             label: Text("ADD"),
