@@ -35,6 +35,8 @@ class Todo {
   Todo(this.text, {this.done = false});
 }
 
+enum FilterOption {all, done, undone}
+
 class TodoListPage extends StatefulWidget {
   const TodoListPage({super.key});
 
@@ -54,6 +56,8 @@ class _TodoListPageState extends State<TodoListPage> {
     Todo("Meditate"),
   ];
 
+  FilterOption currentFilter = FilterOption.all;
+
   void _addTodo (String newTodo) {
     setState(() {
       todos.add(Todo(newTodo));
@@ -72,6 +76,24 @@ class _TodoListPageState extends State<TodoListPage> {
     });
   }
 
+  List<Todo> get filteredTodos { //filtreringen
+    switch (currentFilter) {
+      case FilterOption.done:
+      return todos.where((t) => !t.done).toList();
+      case FilterOption.undone:
+      return todos.where((t) => !t.done).toList();
+      case FilterOption.all:
+      default:
+      return todos;
+    }
+  }
+
+  void _setFilter(FilterOption filter) {
+    setState(() {
+      currentFilter = filter;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -81,34 +103,38 @@ class _TodoListPageState extends State<TodoListPage> {
         actions: [
           IconButton(
             icon: Icon(Icons.more_vert),
-            onPressed: () {
-              showDialog(
+            onPressed: () async {
+              final result = await showDialog<FilterOption>(
                 context: context,
                 builder: (context) => const FilterPopUp(),
               );
+              if (result != null) {
+                _setFilter(result);
+              }
             },
           ),
         ],
       ),
       body: ListView.builder(
-        itemCount: todos.length,
+        itemCount: filteredTodos.length,
         itemBuilder: (context, index) {
+          final todo = filteredTodos[index];
           return ListTile(
             leading: Checkbox(
-              value: todos[index].done,
-              onChanged: (value) => _toggleDone(index, value),
+              value: todo.done,
+              onChanged: (value) => _toggleDone(todos.indexOf(todo), value),
             ),
             title: Text(
-              todos[index].text,
+              todo.text,
               style: TextStyle(
-                decoration: todos[index].done
-                ? TextDecoration.lineThrough //överstrykning vid givet index
+                decoration: todo.done
+                ? TextDecoration.lineThrough //överstrykning
                 : TextDecoration.none,
               ),
             ),
             trailing: IconButton(
               icon: const Icon(Icons.close),
-              onPressed: () => _removeTodo(index), //ta bort todo vid givet index
+              onPressed: () => _removeTodo(todos.indexOf(todo)), //ta bort todo
             ),
           );
         },
