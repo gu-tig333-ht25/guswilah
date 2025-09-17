@@ -28,10 +28,15 @@ class MyApp extends StatelessWidget {
   }
 }
 
-class TodoListPage extends StatelessWidget {
-  TodoListPage({super.key});
+class TodoListPage extends StatefulWidget {
+  const TodoListPage({super.key});
 
-  final todos = [
+  @override
+  State<TodoListPage> createState() => _TodoListPageState();
+}
+
+class _TodoListPageState extends State<TodoListPage> {
+  final List<String>todos = [
     "Write a book",
     "Do homework",
     "Tidy room",
@@ -41,6 +46,12 @@ class TodoListPage extends StatelessWidget {
     "Have fun",
     "Meditate",
   ];
+
+  void _addTodo (String newTodo) {
+    setState(() {
+      todos.add(newTodo);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -77,7 +88,11 @@ class TodoListPage extends StatelessWidget {
         onPressed: () {
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => AddTodoPage()),
+            MaterialPageRoute(
+              builder: (context) => AddTodoPage(
+                onAdd: _addTodo, //skicka med callback
+              )
+            ),
           );
         },
         child: Icon(Icons.add),
