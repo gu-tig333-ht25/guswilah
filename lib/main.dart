@@ -28,6 +28,13 @@ class MyApp extends StatelessWidget {
   }
 }
 
+class Todo {
+  String text;
+  bool done;
+
+  Todo(this.text, {this.done = false});
+}
+
 class TodoListPage extends StatefulWidget {
   const TodoListPage({super.key});
 
@@ -36,20 +43,26 @@ class TodoListPage extends StatefulWidget {
 }
 
 class _TodoListPageState extends State<TodoListPage> {
-  final List<String>todos = [
-    "Write a book",
-    "Do homework",
-    "Tidy room",
-    "Watch TV",
-    "Nap",
-    "Shop groceries",
-    "Have fun",
-    "Meditate",
+  final List<Todo> todos = [
+    Todo("Write a book"),
+    Todo("Do homework"),
+    Todo("Tidy room"),
+    Todo("Watch TV"),
+    Todo("Nap"),
+    Todo("Shop groceries"),
+    Todo("Have fun"),
+    Todo("Meditate"),
   ];
 
   void _addTodo (String newTodo) {
     setState(() {
-      todos.add(newTodo);
+      todos.add(Todo(newTodo));
+    });
+  }
+
+  void _toggleDone(int index, bool? value){
+    setState(() {
+      todos[index].done = value ?? false;
     });
   }
 
@@ -57,7 +70,7 @@ class _TodoListPageState extends State<TodoListPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("TIG333 TODO"),
+        title: const Text("TIG333 TODO"),
         backgroundColor: const Color.fromARGB(255, 141, 86, 208),
         actions: [
           IconButton(
@@ -76,11 +89,18 @@ class _TodoListPageState extends State<TodoListPage> {
         itemBuilder: (context, index) {
           return ListTile(
             leading: Checkbox(
-              value: false,
-              onChanged: (_) {},
+              value: todos[index].done,
+              onChanged: (value) => _toggleDone(index, value),
             ),
-            title: Text(todos[index]),
-            trailing: Icon(Icons.close),
+            title: Text(
+              todos[index].text,
+              style: TextStyle(
+                decoration: todos[index].done
+                ? TextDecoration.lineThrough //överstrykning
+                : TextDecoration.none,
+              ),
+            ),
+            trailing: const Icon(Icons.close),
           );
         },
       ),
