@@ -60,9 +60,15 @@ class _TodoListPageState extends State<TodoListPage> {
     });
   }
 
-  void _toggleDone(int index, bool? value){
+  void _toggleDone(int index, bool? value){ //klass för att kunna stryka över via checkbox
     setState(() {
       todos[index].done = value ?? false;
+    });
+  }
+
+  void _removeTodo(int index) { //klass för att ta bort task via krysset
+    setState(() {
+      todos.removeAt(index); //ta bort todo vid givet index
     });
   }
 
@@ -96,11 +102,14 @@ class _TodoListPageState extends State<TodoListPage> {
               todos[index].text,
               style: TextStyle(
                 decoration: todos[index].done
-                ? TextDecoration.lineThrough //överstrykning
+                ? TextDecoration.lineThrough //överstrykning vid givet index
                 : TextDecoration.none,
               ),
             ),
-            trailing: const Icon(Icons.close),
+            trailing: IconButton(
+              icon: const Icon(Icons.close),
+              onPressed: () => _removeTodo(index), //ta bort todo vid givet index
+            ),
           );
         },
       ),
