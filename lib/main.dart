@@ -79,7 +79,7 @@ class _TodoListPageState extends State<TodoListPage> {
   List<Todo> get filteredTodos { //filtreringen
     switch (currentFilter) {
       case FilterOption.done:
-      return todos.where((t) => !t.done).toList();
+      return todos.where((t) => t.done).toList();
       case FilterOption.undone:
       return todos.where((t) => !t.done).toList();
       case FilterOption.all:
