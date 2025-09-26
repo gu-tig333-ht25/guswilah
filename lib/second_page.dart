@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'todo_provider.dart';
 
 class AddTodoPage extends StatefulWidget { //Stateful för att ta emot användaens text, föränderlig
-  final Function(String) onAdd; //tar emot callbackfunktionen (TodolistPage skickar in _addTodo, när onAdd anropas uppdateras listanm)
-
-  const AddTodoPage({super.key, required this.onAdd}); //konstruktor, måste ha onAdd med
+  const AddTodoPage({super.key});
 
   @override
   State<AddTodoPage> createState() => _AddTodoPageState(); //kopplar till _AddTodoPageState där logiken är
@@ -12,9 +12,10 @@ class AddTodoPage extends StatefulWidget { //Stateful för att ta emot användae
 class _AddTodoPageState extends State<AddTodoPage> { //funktionaliteten
   final TextEditingController _controller = TextEditingController(); //håller koll på TextField
 
-void _handleAdd() {
-  if (_controller.text.isNotEmpty) { //får inte vara tom
-    widget.onAdd(_controller.text); //Anropar TodoListPage, lägg till i listan
+void _handleAdd() { //kommentarer needed
+  final text = _controller.text;
+  if (text.isNotEmpty) {
+    context.read<TodoProvider>().addTodo(text);
     Navigator.pop(context); //tillbaka till första sidan
   }
 }
@@ -37,12 +38,13 @@ void _handleAdd() {
           children: [
             TextField( //skriva in ny todo
               controller: _controller, //koppla med TextEditingController
-              decoration: InputDecoration(
+              decoration: const InputDecoration(
                 border: OutlineInputBorder(), //ram
                 hintText: "What are you going to do?",
               ),
+              onSubmitted: (_) => _handleAdd(),
             ),
-            SizedBox(height: 20), //plats mellan text och knapp
+            const SizedBox(height: 20), //plats mellan text och knapp
             Center( //knappen för att lägga till ny todo
               child: TextButton.icon(
                 onPressed: _handleAdd,
