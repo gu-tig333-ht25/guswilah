@@ -3,11 +3,19 @@ import 'package:provider/provider.dart';
 import 'second_page.dart';
 import 'pop_up.dart';
 import 'todo_provider.dart';
+import 'todo_service.dart';
+import 'todo.dart';
 
-void main() { //laddar hela widgetträdet
+void main() {
+  const apiKey = "0036bbe0-bafb-4dce-a8dd-40800c504c76"; //laddar hela widgetträdet
+
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => TodoProvider(),
+    ChangeNotifierProvider <TodoProvider>(
+      create: (_) {
+        final provider = TodoProvider(TodoService(apiKey));
+      provider.loadTodos();
+      return provider;
+      },
       child: MyApp(),
     ),
   ); //första widgeten (??)
@@ -41,7 +49,7 @@ class TodoListPage extends StatelessWidget { //(??)
   @override
   Widget build(BuildContext context){
     final provider = context.watch<TodoProvider>();
-    final todos = provider.todos;
+    final todos = provider.filteredTodos;
   
     return Scaffold(
       appBar: AppBar(
@@ -70,10 +78,10 @@ class TodoListPage extends StatelessWidget { //(??)
           return ListTile( //standardrad med leading/title/trailing
             leading: Checkbox( //ändrar todo.done
               value: todo.done,
-              onChanged: (_) => provider.toggleTodo(index), //anropar _toggleDone med index via todos.indexOf(todo)
+              onChanged: (_) => provider.toggleTodo(todo), //(??)
             ),
             title: Text( //visar uppgiftstexten
-              todo.text,
+              todo.title,
               style: TextStyle(
                 decoration: todo.done
                 ? TextDecoration.lineThrough //överstrykning
@@ -82,7 +90,7 @@ class TodoListPage extends StatelessWidget { //(??)
             ),
             trailing: IconButton( //krysset tar bort todo via index
               icon: const Icon(Icons.close),
-              onPressed: () => provider.removeTodoAt(index), //ta bort todo
+              onPressed: () => provider.removeTodo(todo), //ta bort todo
             ),
           );
         },

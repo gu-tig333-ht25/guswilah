@@ -1,71 +1,88 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'todo_service.dart';
+import 'todo.dart';
 
-class Todo {
-  final String text;
-  final bool done;
-
-  const Todo(this.text, {this.done = false});
-
-  Todo copyWith({String? text, bool? done}) {
-    return Todo(
-      text ?? this.text,
-      done: done ?? this.done,
-    );
-  }
-}
-
-enum FilterOption { all, done, undone }
 
 class TodoProvider extends ChangeNotifier {
-  final List<Todo> _todos = [
-    Todo("Write a book"),
-    Todo("Do homework"),
-    Todo("Tidy room"),
-    Todo("Watch TV"),
-    Todo("Nap"),
-    Todo("Shop groceries"),
-    Todo("Have fun"),
-    Todo("Meditate"),
-  ];
+  final TodoService service;
 
   FilterOption _filter = FilterOption.all;
+  FilterOption get filter => _filter;
 
-  List<Todo> get todos {
+  List<Todo> _todos = [];
+  bool _isLoading = false;
+  String? _error;
+
+  TodoProvider(this.service);
+
+  List<Todo> get todos => _todos;
+  bool get isLoading => _isLoading;
+  String? get error => _error;
+
+  int get totalCount => _todos.length;
+  int get completedCount => _todos.where((t) => t.done).length;
+
+  List<Todo> get filteredTodos {
     switch (_filter) {
       case FilterOption.done:
         return _todos.where((t) => t.done).toList();
       case FilterOption.undone:
         return _todos.where((t) => !t.done).toList();
       case FilterOption.all:
-      default:
         return _todos;
     }
   }
 
-  FilterOption get filter => _filter;
-
-  void addTodo(String text) {
-    if (text.trim().isEmpty) return;
-    _todos.add(Todo(text.trim()));
+  void setFilter(FilterOption newFilter) {
+    _filter = newFilter;
     notifyListeners();
   }
 
-  void toggleTodo(int index) {
-    final todo = _todos[index];
-    _todos[index] = todo.copyWith(done: !todo.done);
+  Future<void> loadTodos() async {
+    _isLoading = true;
+    _error = null;
+    notifyListeners();
+
+    try {
+      _todos = await service.getTodos();
+    } catch (e) {
+      _error = e.toString();
+    }
+
+    _isLoading = false;
     notifyListeners();
   }
 
-  void removeTodoAt(int index) {
-    _todos.removeAt(index);
-    notifyListeners();
+  Future<void> addTodo(String title) async {
+    try {
+      final newTodo = Todo.create(title);
+      await service.addTodo(newTodo);
+      await loadTodos();
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+    }
   }
 
-  void setFilter(FilterOption filter) {
-    _filter = filter;
-    notifyListeners();
+  Future<void> toggleTodo(Todo todo) async {
+    try {
+      todo.done = !todo.done;
+      await service.updateTodo(todo);
+      await loadTodos();
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+    }
   }
 
-  int get completedCount => _todos.where((t) => t.done).length;
-  int get totalCount => _todos.length;
+  Future<void> removeTodo(Todo todo) async {
+    try {
+      await service.deleteTodo(todo.id);
+      _todos.remove(todo);
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+    }
+  }
 }
