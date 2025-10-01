@@ -10,19 +10,19 @@ class TodoProvider extends ChangeNotifier { //provider som hanterar state för a
   final TodoService service; //service för APIanrop
 
   FilterOption _filter = FilterOption.all; //default för filtret är all
-  FilterOption get filter => _filter; //publik getter för filter
+  FilterOption get filter => _filter; 
 
-  List<Todo> _todos = []; //privat lista med todos
-  bool _isLoading = false; //privat flagga för laddnindsstatus
-  String? _error; //privat string för felmeddelande
+  List<Todo> _todos = []; 
+  bool _isLoading = false;
+  String? _error; 
 
-  TodoProvider(this.service); //konstruktor som tar in en TodoService
+  TodoProvider(this.service); 
 
   List<Todo> get todos => _todos; //getter för listan med todos
-  bool get isLoading => _isLoading; //getter för laddningsflagga
-  String? get error => _error; //getter för felmeddelande
+  bool get isLoading => _isLoading; 
+  String? get error => _error;
 
-  int get totalCount => _todos.length; //gör antal todos totalt
+  int get totalCount => _todos.length; 
   int get completedCount => _todos.where((t) => t.done).length; //antal todos som är gjorda
 
   List<Todo> get filteredTodos { //returnerar lista beroende på filtret
@@ -37,13 +37,13 @@ class TodoProvider extends ChangeNotifier { //provider som hanterar state för a
   }
 
   void setFilter(FilterOption newFilter) { //ändrar filter
-    _filter = newFilter; //uppdaterar privat variabel
-    notifyListeners(); //meddelar UI:t
+    _filter = newFilter; 
+    notifyListeners(); 
   }
 
   Future<void> loadTodos() async { //hämtar todos från API
-    _isLoading = true; //laddningsstatus
-    _error = null; //nollstället felmeddelande
+    _isLoading = true; 
+    _error = null; 
     notifyListeners();
 
     try {
@@ -53,14 +53,14 @@ class TodoProvider extends ChangeNotifier { //provider som hanterar state för a
     }
 
     _isLoading = false; //sluta ladda
-    notifyListeners(); //uppdatera UI (eller fel)
+    notifyListeners(); 
   }
 
   Future<void> addTodo(String title) async { //lägger  till ny todo
     try {
-      final newTodo = Todo.create(title); //skapar ny todo
-      await service.addTodo(newTodo); //skicka till API
-      await loadTodos(); //ladda om listan från API 
+      final newTodo = Todo.create(title); 
+      await service.addTodo(newTodo); 
+      await loadTodos();  
     } catch (e) {
       _error = e.toString(); //spara fel
       notifyListeners();
@@ -69,19 +69,19 @@ class TodoProvider extends ChangeNotifier { //provider som hanterar state för a
 
   Future<void> toggleTodo(Todo todo) async { //ändra todos donestatus
     try {
-      todo.done = !todo.done; //byter värde
-      await service.updateTodo(todo); //uppdaterar servern
-      await loadTodos(); //ladda om listan
+      todo.done = !todo.done; 
+      await service.updateTodo(todo); 
+      await loadTodos(); 
     } catch (e) {
-      _error = e.toString(); //vid fel
+      _error = e.toString(); 
       notifyListeners();
     }
   }
 
   Future<void> removeTodo(Todo todo) async { //Ta bort en todo
     try {
-      await service.deleteTodo(todo.id); //Ta bort från servern
-      _todos.remove(todo); //ta bort lokalt
+      await service.deleteTodo(todo.id); 
+      _todos.remove(todo); 
       notifyListeners();
     } catch (e) {
       _error = e.toString();
