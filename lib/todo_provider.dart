@@ -2,27 +2,30 @@ import 'package:flutter/foundation.dart';
 import 'todo_service.dart';
 import 'todo.dart';
 
+//Fil för statemanagement
 
-class TodoProvider extends ChangeNotifier {
-  final TodoService service;
+enum FilterOption {all, done, undone} //filteralternativ
 
-  FilterOption _filter = FilterOption.all;
-  FilterOption get filter => _filter;
+class TodoProvider extends ChangeNotifier { //provider som hanterar state för alla todos
+  final TodoService service; //service för APIanrop
 
-  List<Todo> _todos = [];
-  bool _isLoading = false;
-  String? _error;
+  FilterOption _filter = FilterOption.all; //default för filtret är all
+  FilterOption get filter => _filter; //publik getter för filter
 
-  TodoProvider(this.service);
+  List<Todo> _todos = []; //privat lista med todos
+  bool _isLoading = false; //privat flagga för laddnindsstatus
+  String? _error; //privat string för felmeddelande
 
-  List<Todo> get todos => _todos;
-  bool get isLoading => _isLoading;
-  String? get error => _error;
+  TodoProvider(this.service); //konstruktor som tar in en TodoService
 
-  int get totalCount => _todos.length;
-  int get completedCount => _todos.where((t) => t.done).length;
+  List<Todo> get todos => _todos; //getter för listan med todos
+  bool get isLoading => _isLoading; //getter för laddningsflagga
+  String? get error => _error; //getter för felmeddelande
 
-  List<Todo> get filteredTodos {
+  int get totalCount => _todos.length; //gör antal todos totalt
+  int get completedCount => _todos.where((t) => t.done).length; //antal todos som är gjorda
+
+  List<Todo> get filteredTodos { //returnerar lista beroende på filtret
     switch (_filter) {
       case FilterOption.done:
         return _todos.where((t) => t.done).toList();
@@ -33,52 +36,52 @@ class TodoProvider extends ChangeNotifier {
     }
   }
 
-  void setFilter(FilterOption newFilter) {
-    _filter = newFilter;
-    notifyListeners();
+  void setFilter(FilterOption newFilter) { //ändrar filter
+    _filter = newFilter; //uppdaterar privat variabel
+    notifyListeners(); //meddelar UI:t
   }
 
-  Future<void> loadTodos() async {
-    _isLoading = true;
-    _error = null;
+  Future<void> loadTodos() async { //hämtar todos från API
+    _isLoading = true; //laddningsstatus
+    _error = null; //nollstället felmeddelande
     notifyListeners();
 
     try {
-      _todos = await service.getTodos();
+      _todos = await service.getTodos(); //hämtar lista från API:t
     } catch (e) {
-      _error = e.toString();
+      _error = e.toString(); //spara fel
     }
 
-    _isLoading = false;
-    notifyListeners();
+    _isLoading = false; //sluta ladda
+    notifyListeners(); //uppdatera UI (eller fel)
   }
 
-  Future<void> addTodo(String title) async {
+  Future<void> addTodo(String title) async { //lägger  till ny todo
     try {
-      final newTodo = Todo.create(title);
-      await service.addTodo(newTodo);
-      await loadTodos();
+      final newTodo = Todo.create(title); //skapar ny todo
+      await service.addTodo(newTodo); //skicka till API
+      await loadTodos(); //ladda om listan från API 
     } catch (e) {
-      _error = e.toString();
+      _error = e.toString(); //spara fel
       notifyListeners();
     }
   }
 
-  Future<void> toggleTodo(Todo todo) async {
+  Future<void> toggleTodo(Todo todo) async { //ändra todos donestatus
     try {
-      todo.done = !todo.done;
-      await service.updateTodo(todo);
-      await loadTodos();
+      todo.done = !todo.done; //byter värde
+      await service.updateTodo(todo); //uppdaterar servern
+      await loadTodos(); //ladda om listan
     } catch (e) {
-      _error = e.toString();
+      _error = e.toString(); //vid fel
       notifyListeners();
     }
   }
 
-  Future<void> removeTodo(Todo todo) async {
+  Future<void> removeTodo(Todo todo) async { //Ta bort en todo
     try {
-      await service.deleteTodo(todo.id);
-      _todos.remove(todo);
+      await service.deleteTodo(todo.id); //Ta bort från servern
+      _todos.remove(todo); //ta bort lokalt
       notifyListeners();
     } catch (e) {
       _error = e.toString();
