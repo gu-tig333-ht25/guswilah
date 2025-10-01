@@ -1,71 +1,91 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
+import 'todo_service.dart';
+import 'todo.dart';
 
-class Todo {
-  final String text;
-  final bool done;
+//Fil för statemanagement
 
-  const Todo(this.text, {this.done = false});
+enum FilterOption {all, done, undone} //filteralternativ
 
-  Todo copyWith({String? text, bool? done}) {
-    return Todo(
-      text ?? this.text,
-      done: done ?? this.done,
-    );
-  }
-}
+class TodoProvider extends ChangeNotifier { //provider som hanterar state för alla todos
+  final TodoService service; //service för APIanrop
 
-enum FilterOption { all, done, undone }
+  FilterOption _filter = FilterOption.all; //default för filtret är all
+  FilterOption get filter => _filter; 
 
-class TodoProvider extends ChangeNotifier {
-  final List<Todo> _todos = [
-    Todo("Write a book"),
-    Todo("Do homework"),
-    Todo("Tidy room"),
-    Todo("Watch TV"),
-    Todo("Nap"),
-    Todo("Shop groceries"),
-    Todo("Have fun"),
-    Todo("Meditate"),
-  ];
+  List<Todo> _todos = []; 
+  bool _isLoading = false;
+  String? _error; 
 
-  FilterOption _filter = FilterOption.all;
+  TodoProvider(this.service); 
 
-  List<Todo> get todos {
+  List<Todo> get todos => _todos; //getter för listan med todos
+  bool get isLoading => _isLoading; 
+  String? get error => _error;
+
+  int get totalCount => _todos.length; 
+  int get completedCount => _todos.where((t) => t.done).length; //antal todos som är gjorda
+
+  List<Todo> get filteredTodos { //returnerar lista beroende på filtret
     switch (_filter) {
       case FilterOption.done:
         return _todos.where((t) => t.done).toList();
       case FilterOption.undone:
         return _todos.where((t) => !t.done).toList();
       case FilterOption.all:
-      default:
         return _todos;
     }
   }
 
-  FilterOption get filter => _filter;
-
-  void addTodo(String text) {
-    if (text.trim().isEmpty) return;
-    _todos.add(Todo(text.trim()));
-    notifyListeners();
+  void setFilter(FilterOption newFilter) { //ändrar filter
+    _filter = newFilter; 
+    notifyListeners(); 
   }
 
-  void toggleTodo(int index) {
-    final todo = _todos[index];
-    _todos[index] = todo.copyWith(done: !todo.done);
+  Future<void> loadTodos() async { //hämtar todos från API
+    _isLoading = true; 
+    _error = null; 
     notifyListeners();
+
+    try {
+      _todos = await service.getTodos(); //hämtar lista från API:t
+    } catch (e) {
+      _error = e.toString(); //spara fel
+    }
+
+    _isLoading = false; //sluta ladda
+    notifyListeners(); 
   }
 
-  void removeTodoAt(int index) {
-    _todos.removeAt(index);
-    notifyListeners();
+  Future<void> addTodo(String title) async { //lägger  till ny todo
+    try {
+      final newTodo = Todo.create(title); 
+      await service.addTodo(newTodo); 
+      await loadTodos();  
+    } catch (e) {
+      _error = e.toString(); //spara fel
+      notifyListeners();
+    }
   }
 
-  void setFilter(FilterOption filter) {
-    _filter = filter;
-    notifyListeners();
+  Future<void> toggleTodo(Todo todo) async { //ändra todos donestatus
+    try {
+      todo.done = !todo.done; 
+      await service.updateTodo(todo); 
+      await loadTodos(); 
+    } catch (e) {
+      _error = e.toString(); 
+      notifyListeners();
+    }
   }
 
-  int get completedCount => _todos.where((t) => t.done).length;
-  int get totalCount => _todos.length;
+  Future<void> removeTodo(Todo todo) async { //Ta bort en todo
+    try {
+      await service.deleteTodo(todo.id); 
+      _todos.remove(todo); 
+      notifyListeners();
+    } catch (e) {
+      _error = e.toString();
+      notifyListeners();
+    }
+  }
 }

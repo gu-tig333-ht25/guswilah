@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'todo_provider.dart';
+import 'todo.dart';
 
 class FilterPopUp extends StatelessWidget { //stateless för popupen aldrig ändras
   const FilterPopUp({super.key}); //const = oföränderlig konstruktor
