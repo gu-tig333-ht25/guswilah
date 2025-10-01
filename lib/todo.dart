@@ -1,16 +1,16 @@
-class Todo {
-  final String id;
-  final String title;
-  bool done;
+class Todo { //todo modell
+  final String id; //unikt id
+  final String title; //textbeskrivning
+  bool done; //avckeckad eller inte
 
-  Todo({required this.id, required this.title, this.done = false});
+  Todo({required this.id, required this.title, this.done = false}); //konstruktor som kräver id, titel och status
 
-  // Används när vi skapar ny todo (utan id)
+  //Skapa ny todo
   factory Todo.create(String title) {
-    return Todo(id: "", title: title, done: false);
+    return Todo(id: "", title: title, done: false); //servern skapar id
   }
 
-  factory Todo.fromJson(Map<String, dynamic> json) {
+  factory Todo.fromJson(Map<String, dynamic> json) { //skapa todo från JSON
     return Todo(
       id: json["id"],
       title: json["title"],
@@ -18,7 +18,7 @@ class Todo {
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toJson() { //gör om todo till JSON
     return {
       "title": title,
       "done": done,
@@ -26,4 +26,4 @@ class Todo {
   }
 }
 
-enum FilterOption {all, done, undone}
+enum FilterOption {all, done, undone} //filteralternativ
